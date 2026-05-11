@@ -1,1 +1,1 @@
-# Kansas.jp
+# Kansai.jp

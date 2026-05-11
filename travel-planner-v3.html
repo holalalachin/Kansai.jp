@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>旅遊全方位工具</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Noto+Sans+TC:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0f14;
+  --s1:#111720;
+  --s2:#161d28;
+  --s3:#1c2535;
+  --border:#252f3e;
+  --border2:#2e3c50;
+  --text:#dde6f0;
+  --muted:#6b7f96;
+  --muted2:#4a5a6e;
+  --accent:#e8963a;
+  --accent2:#4da8f0;
+  --green:#45c97a;
+  --red:#f05c5c;
+  --purple:#a78bfa;
+  --yellow:#f0c040;
+  --day1:#4da8f0;--day2:#e8963a;--day3:#45c97a;--day4:#a78bfa;--day5:#f07070;--day6:#60d0d0;
+  --radius:8px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 15% 20%,rgba(77,168,240,.06),transparent),radial-gradient(ellipse 60% 80% at 85% 80%,rgba(232,150,58,.05),transparent);pointer-events:none;z-index:0}
+
+/* ══ NAV ══ */
+nav{
+  display:flex;align-items:center;gap:0;
+  background:var(--s1);border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 20px rgba(0,0,0,.4);
+}
+.nav-brand{
+  padding:0 1.8rem;border-right:1px solid var(--border);
+  font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;
+  white-space:nowrap;color:var(--accent);
+  display:flex;align-items:center;gap:.5rem;height:52px;
+}
+.nav-brand span{font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);font-family:'Noto Sans TC',sans-serif;font-weight:400}
+.nav-tabs{display:flex;flex:1;overflow-x:auto}
+.nav-tab{
+  display:flex;align-items:center;gap:.45rem;
+  padding:0 1.4rem;height:52px;
+  font-size:.78rem;font-weight:500;letter-spacing:.03em;
+  color:var(--muted);cursor:pointer;white-space:nowrap;
+  border-bottom:2px solid transparent;transition:all .2s;
+  background:none;border-top:none;border-left:none;border-right:none;
+  font-family:'Noto Sans TC',sans-serif;
+}
+.nav-tab.active{color:var(--text);border-bottom-color:var(--accent)}
+.nav-tab:hover:not(.active){color:var(--text);background:rgba(255,255,255,.03)}
+.tab-icon{font-size:.9rem}
+
+/* ══ PAGES ══ */
+.page{display:none;animation:pageIn .3s ease}
+.page.active{display:flex;flex-direction:column;min-height:calc(100vh - 52px)}
+@keyframes pageIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ SHARED COMPONENTS ══ */
+.page-header{padding:2rem 2rem 1.5rem;border-bottom:1px solid var(--border)}
+.page-header h2{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;margin-bottom:.3rem}
+.page-header p{font-size:.82rem;color:var(--muted);line-height:1.6}
+.section{padding:1.5rem 2rem}
+@media(max-width:700px){.section{padding:1rem}}
+
+.card{background:var(--s2);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem}
+.card-sm{background:var(--s2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem}
+
+.field-label{font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;display:block}
+input[type=text],input[type=number],input[type=date],select,textarea{
+  width:100%;background:var(--s1);border:1px solid var(--border2);
+  border-radius:6px;padding:.6rem .85rem;
+  font-family:'Noto Sans TC',sans-serif;font-size:.83rem;color:var(--text);
+  transition:border-color .2s,box-shadow .2s;appearance:none;-webkit-appearance:none;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(232,150,58,.12)}
+textarea{resize:vertical;min-height:70px;line-height:1.7}
+select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7f96' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .75rem center;padding-right:2rem}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.6rem 1.2rem;border-radius:6px;font-family:'Noto Sans TC',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;border:none;transition:all .18s}
+.btn-primary{background:var(--accent);color:white;box-shadow:0 2px 12px rgba(232,150,58,.3)}
+.btn-primary:hover{background:#d4832a;box-shadow:0 4px 20px rgba(232,150,58,.45);transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border2)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:transparent;color:var(--red);border:1px solid rgba(240,92,92,.3)}
+.btn-danger:hover{background:rgba(240,92,92,.1)}
+.btn-sm{padding:.35rem .8rem;font-size:.75rem}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+
+.badge{display:inline-flex;align-items:center;padding:.15rem .55rem;border-radius:20px;font-size:.65rem;font-weight:700}
+.chip{display:inline-flex;align-items:center;gap:.3rem;padding:.2rem .65rem;border-radius:20px;font-size:.72rem;background:rgba(255,255,255,.05);border:1px solid var(--border2);color:var(--muted)}
+
+.mono{font-family:'DM Mono',monospace}
+
+/* loader */
+.loader-ring{width:16px;height:16px;border:2px solid rgba(255,255,255,.2);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ══════════════════════════════════════════
+   PAGE 1: ROUTE PLANNER
+══════════════════════════════════════════ */
+.planner-body{
+  display:grid;grid-template-columns:360px 1fr;
+  flex:1;overflow:hidden;
+}
+@media(max-width:900px){.planner-body{grid-template-columns:1fr;overflow:auto}}
+
+/* Left panel */
+.planner-left{border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:var(--s1)}
+.inner-tabs{display:flex;border-bottom:1px solid var(--border)}
+.inner-tab{flex:1;padding:.65rem;font-size:.75rem;font-weight:600;color:var(--muted);cursor:pointer;text-align:center;border-bottom:2px solid transparent;transition:all .2s;background:none;border-top:none;border-left:none;border-right:none;font-family:'Noto Sans TC',sans-serif}
+.inner-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.inner-content{display:none;flex:1;overflow-y:auto;padding:1.2rem;flex-direction:column;gap:.8rem}
+.inner-content.active{display:flex}
+
+/* place list items */
+.place-item{display:flex;align-items:center;gap:.55rem;padding:.6rem .8rem;background:var(--bg);border:1px solid var(--border);border-radius:6px;cursor:grab;transition:all .15s;user-select:none}
+.place-item:active{cursor:grabbing;opacity:.6}
+.place-item.dragging{opacity:.25;border-style:dashed}
+.place-item.drag-over{border-color:var(--accent);background:rgba(232,150,58,.07)}
+.place-item.disabled{opacity:.35}
+.drag-handle{color:var(--muted2);font-size:.8rem;cursor:grab;flex-shrink:0}
+.place-chk{width:15px;height:15px;border-radius:4px;border:2px solid var(--border2);background:transparent;cursor:pointer;appearance:none;-webkit-appearance:none;transition:all .15s;flex-shrink:0;position:relative}
+.place-chk:checked{background:var(--green);border-color:var(--green)}
+.place-chk:checked::after{content:'✓';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:9px;color:white;font-weight:700}
+.place-nm{flex:1;font-size:.8rem;line-height:1.3}
+.day-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.place-del{color:var(--muted2);background:none;border:none;cursor:pointer;font-size:.75rem;padding:.1rem .3rem;border-radius:3px;transition:color .15s}
+.place-del:hover{color:var(--red)}
+
+/* Right panel */
+.planner-right{display:flex;flex-direction:column;overflow:hidden}
+.map-area{flex:1;position:relative;background:var(--s2);display:flex;align-items:center;justify-content:center;min-height:260px}
+.map-ph{text-align:center;color:var(--muted)}
+.map-ph .mi{font-size:2.5rem;opacity:.25;margin-bottom:.6rem}
+.map-ph p{font-size:.8rem;line-height:1.7}
+#mapSvg{width:100%;height:100%;position:absolute;inset:0}
+.map-path{fill:none;stroke-width:2;stroke-dasharray:6 4;opacity:.6;animation:dashMove 20s linear infinite}
+@keyframes dashMove{to{stroke-dashoffset:-200}}
+
+.itin-bar{border-top:1px solid var(--border);background:var(--s1);max-height:260px;overflow-y:auto;display:none}
+.itin-hdr{padding:.7rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--s1);z-index:2}
+.itin-hdr-title{font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.day-tabs-row{display:flex;gap:.4rem;overflow-x:auto;padding:.55rem 1.2rem;border-bottom:1px solid var(--border)}
+.day-tab-btn{flex-shrink:0;padding:.28rem .85rem;border-radius:20px;font-size:.7rem;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--muted);font-family:'Noto Sans TC',sans-serif;transition:all .2s}
+.stops-list{padding:.5rem 1.2rem .8rem}
+.stop-row{display:flex;align-items:flex-start;gap:.7rem;padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.04);animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.stop-row:last-child{border-bottom:none}
+.stop-badge{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:white;flex-shrink:0;margin-top:2px}
+.stop-detail{flex:1}
+.stop-nm{font-size:.83rem;font-weight:500;margin-bottom:.15rem}
+.stop-meta{display:flex;gap:.7rem;flex-wrap:wrap}
+.meta-c{font-size:.67rem;color:var(--muted);display:flex;align-items:center;gap:.2rem}
+.stop-tip{font-size:.7rem;color:var(--muted);margin-top:.18rem;line-height:1.4;font-style:italic}
+.maps-lnk{font-size:.67rem;color:var(--accent2);text-decoration:none;opacity:.7;transition:opacity .15s;flex-shrink:0;margin-top:3px}
+.maps-lnk:hover{opacity:1}
+.tips-bar{margin:.8rem 1.2rem;padding:.8rem 1rem;background:rgba(232,150,58,.07);border:1px solid rgba(232,150,58,.2);border-radius:6px;font-size:.77rem;color:var(--muted);line-height:1.8}
+.tips-bar strong{color:var(--accent);font-size:.67rem;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:.3rem}
+.sum-chips{display:flex;gap:.4rem;flex-wrap:wrap;padding:.55rem 1.2rem;border-bottom:1px solid var(--border)}
+.err-box{padding:.65rem .9rem;background:rgba(240,92,92,.1);border:1px solid rgba(240,92,92,.3);border-radius:6px;font-size:.77rem;color:var(--red);display:none}
+.err-box.show{display:block}
+
+/* ══════════════════════════════════════════
+   PAGE 2: CURRENCY
+══════════════════════════════════════════ */
+.currency-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;
+  padding:1.5rem 2rem;
+}
+@media(max-width:750px){.currency-grid{grid-template-columns:1fr}}
+
+.fx-card{background:var(--s2);border:1px solid var(--border);border-radius:var(--radius);padding:1.6rem;position:relative;overflow:hidden}
+.fx-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent2),var(--accent))}
+
+.fx-row{display:flex;align-items:flex-end;gap:1rem;margin-bottom:1.2rem}
+.fx-amount-wrap{flex:1;position:relative}
+.fx-amount-wrap input{font-family:'DM Mono',monospace;font-size:1.5rem;padding:.7rem 1rem;background:var(--s1)}
+.fx-currency-sel{width:110px}
+.fx-currency-sel select{font-size:.8rem;height:100%}
+
+.swap-btn{
+  width:38px;height:38px;border-radius:50%;background:var(--s3);border:1px solid var(--border2);
+  color:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;
+  transition:all .2s;flex-shrink:0;align-self:flex-end;margin-bottom:2px;
+}
+.swap-btn:hover{background:var(--accent);color:white;border-color:var(--accent)}
+
+.fx-result{
+  background:var(--s1);border:1px solid var(--border);border-radius:6px;
+  padding:1rem 1.2rem;text-align:center;
+}
+.fx-result-num{font-family:'DM Mono',monospace;font-size:2rem;font-weight:500;color:var(--accent);margin-bottom:.2rem}
+.fx-result-label{font-size:.72rem;color:var(--muted)}
+.fx-rate-info{font-size:.7rem;color:var(--muted2);margin-top:.6rem;text-align:center}
+.fx-rate-info span{color:var(--muted)}
+
+.fx-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.fx-table th{font-size:.67rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:.5rem .8rem;border-bottom:1px solid var(--border);text-align:left}
+.fx-table td{padding:.6rem .8rem;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+.fx-table tr:last-child td{border-bottom:none}
+.fx-table tr:hover td{background:rgba(255,255,255,.02)}
+.fx-flag{font-size:1rem;margin-right:.4rem}
+.fx-val{font-family:'DM Mono',monospace;color:var(--accent2);font-size:.82rem}
+.fx-change.up{color:var(--green)}
+.fx-change.dn{color:var(--red)}
+
+.fx-quick-btns{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem}
+.fx-quick{padding:.25rem .7rem;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid var(--border2);font-size:.72rem;color:var(--muted);cursor:pointer;transition:all .15s;font-family:'Noto Sans TC',sans-serif}
+.fx-quick:hover{border-color:var(--accent2);color:var(--accent2)}
+.fx-quick.active{background:var(--accent2);border-color:var(--accent2);color:white}
+
+.fx-loading{text-align:center;padding:2rem;color:var(--muted);font-size:.82rem}
+.fx-err{padding:.6rem .9rem;background:rgba(240,92,92,.1);border:1px solid rgba(240,92,92,.3);border-radius:6px;font-size:.77rem;color:var(--red);margin-top:.5rem}
+
+/* ══════════════════════════════════════════
+   PAGE 3: EXPENSE TRACKER
+══════════════════════════════════════════ */
+.expense-layout{display:grid;grid-template-columns:420px 1fr;flex:1;overflow:hidden}
+@media(max-width:950px){.expense-layout{grid-template-columns:1fr;overflow:auto}}
+
+/* Form side */
+.expense-form-panel{border-right:1px solid var(--border);overflow-y:auto;background:var(--s1)}
+.form-hdr{padding:1.2rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--s1);z-index:5}
+.form-hdr-title{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.form-body{padding:1.2rem 1.4rem;display:flex;flex-direction:column;gap:1rem}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+@media(max-width:500px){.form-row{grid-template-columns:1fr}}
+
+.amount-input-wrap{position:relative}
+.amount-input-wrap input{font-family:'DM Mono',monospace;font-size:1.3rem;padding:.7rem 1rem .7rem 2.2rem}
+.amount-prefix{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.9rem;pointer-events:none}
+
+.payment-btns{display:flex;gap:.5rem;flex-wrap:wrap}
+.pay-btn{
+  padding:.4rem 1rem;border-radius:20px;font-size:.75rem;font-weight:600;
+  border:1px solid var(--border2);background:transparent;color:var(--muted);
+  cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .2s;
+  display:flex;align-items:center;gap:.3rem;
+}
+.pay-btn.active{background:var(--accent2);border-color:var(--accent2);color:white}
+.pay-btn:hover:not(.active){border-color:var(--accent2);color:var(--accent2)}
+.pay-add{padding:.4rem .8rem;border-radius:20px;font-size:.75rem;border:1px dashed var(--border2);background:transparent;color:var(--muted2);cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .2s}
+.pay-add:hover{border-color:var(--accent);color:var(--accent)}
+
+.cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem}
+.cat-btn{
+  padding:.5rem .3rem;border-radius:6px;font-size:.68rem;
+  border:1px solid var(--border2);background:transparent;color:var(--muted);
+  cursor:pointer;text-align:center;transition:all .2s;font-family:'Noto Sans TC',sans-serif;
+  display:flex;flex-direction:column;align-items:center;gap:.2rem;
+}
+.cat-btn .cat-icon{font-size:1rem}
+.cat-btn.active{background:rgba(167,139,250,.15);border-color:var(--purple);color:var(--purple)}
+.cat-btn:hover:not(.active){border-color:var(--muted);color:var(--text)}
+
+/* Receipt upload */
+.receipt-zone{
+  border:2px dashed var(--border2);border-radius:8px;padding:1.2rem;
+  text-align:center;cursor:pointer;transition:all .2s;position:relative;
+}
+.receipt-zone:hover{border-color:var(--accent2);background:rgba(77,168,240,.04)}
+.receipt-zone.has-file{border-color:var(--green);border-style:solid;background:rgba(69,201,122,.06)}
+.receipt-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.receipt-preview{max-width:100%;max-height:120px;border-radius:4px;margin-top:.6rem;display:none}
+.receipt-icon{font-size:1.4rem;margin-bottom:.3rem;opacity:.5}
+.receipt-label{font-size:.75rem;color:var(--muted)}
+.receipt-name{font-size:.72rem;color:var(--green);margin-top:.3rem}
+
+/* star rating */
+.star-row{display:flex;gap:.3rem}
+.star{font-size:1.2rem;cursor:pointer;color:var(--muted2);transition:color .15s}
+.star.lit{color:var(--yellow)}
+.star:hover{color:var(--yellow)}
+
+/* currency tag */
+.cur-tag-row{display:flex;gap:.5rem;align-items:flex-end}
+.cur-tag-row .fx-currency-sel{width:100px;flex-shrink:0}
+.cur-tag-row input{flex:1}
+
+/* Right side: list */
+.expense-list-panel{overflow-y:auto;display:flex;flex-direction:column}
+.list-hdr{padding:1rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:.8rem;flex-wrap:wrap;position:sticky;top:0;background:var(--bg);z-index:4}
+.list-hdr-left{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap}
+.search-bar{background:var(--s2);border:1px solid var(--border2);border-radius:20px;padding:.4rem 1rem .4rem 2rem;font-size:.8rem;color:var(--text);width:180px;position:relative;font-family:'Noto Sans TC',sans-serif}
+.search-wrap{position:relative}
+.search-wrap::before{content:'🔍';position:absolute;left:.6rem;top:50%;transform:translateY(-50%);font-size:.75rem;pointer-events:none}
+.search-bar:focus{outline:none;border-color:var(--accent)}
+
+.filter-sel{background:var(--s2);border:1px solid var(--border2);border-radius:6px;padding:.4rem .7rem;font-size:.75rem;color:var(--muted);appearance:none;-webkit-appearance:none;cursor:pointer;font-family:'Noto Sans TC',sans-serif;width:auto}
+
+/* Summary bar */
+.exp-summary{display:flex;gap:0;border-bottom:1px solid var(--border);overflow-x:auto}
+.sum-cell{flex:1;min-width:120px;padding:.9rem 1.2rem;border-right:1px solid var(--border);text-align:center}
+.sum-cell:last-child{border-right:none}
+.sum-val{font-family:'DM Mono',monospace;font-size:1.2rem;font-weight:500;margin-bottom:.15rem}
+.sum-lbl{font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+
+/* Expense cards */
+.exp-list{padding:1rem 1.2rem;display:flex;flex-direction:column;gap:.65rem}
+.exp-card{
+  background:var(--s2);border:1px solid var(--border);border-radius:var(--radius);
+  padding:.9rem 1.1rem;display:flex;align-items:flex-start;gap:.8rem;
+  transition:border-color .2s;cursor:pointer;position:relative;
+}
+.exp-card:hover{border-color:var(--border2)}
+.exp-card.editing{border-color:var(--accent);background:rgba(232,150,58,.04)}
+.exp-cat-icon{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.exp-main{flex:1;min-width:0}
+.exp-top{display:flex;align-items:baseline;gap:.6rem;margin-bottom:.2rem;flex-wrap:wrap}
+.exp-amount{font-family:'DM Mono',monospace;font-size:1rem;font-weight:500;color:var(--accent)}
+.exp-cur{font-size:.65rem;color:var(--muted);font-family:'DM Mono',monospace}
+.exp-desc{font-size:.82rem;font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.exp-meta{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+.exp-date{font-size:.67rem;color:var(--muted)}
+.exp-pay-badge{font-size:.65rem;padding:.12rem .5rem;border-radius:20px;background:rgba(77,168,240,.12);color:var(--accent2);border:1px solid rgba(77,168,240,.2)}
+.exp-stars{font-size:.72rem;color:var(--yellow);letter-spacing:-.1rem}
+.exp-receipt-icon{font-size:.75rem;color:var(--muted2)}
+.exp-note{font-size:.72rem;color:var(--muted);margin-top:.25rem;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.exp-actions{display:flex;gap:.3rem;flex-shrink:0;margin-left:.3rem}
+.exp-action-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:all .15s}
+.exp-action-btn:hover{border-color:var(--accent);color:var(--accent)}
+.exp-action-btn.del:hover{border-color:var(--red);color:var(--red)}
+
+.empty-exp{text-align:center;padding:3rem 2rem;color:var(--muted)}
+.empty-exp .ei{font-size:2.5rem;opacity:.25;margin-bottom:.8rem}
+.empty-exp p{font-size:.82rem;line-height:1.7}
+
+/* receipt modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:none;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal-box{background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:1.5rem;max-width:480px;width:90%;animation:fadeUp .25s ease}
+.modal-box img{max-width:100%;border-radius:6px;margin-bottom:1rem}
+.modal-close{float:right;background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;transition:color .15s}
+.modal-close:hover{color:var(--red)}
+
+/* tag input */
+.tag-input-wrap{display:flex;flex-wrap:wrap;gap:.4rem;padding:.5rem .7rem;background:var(--s1);border:1px solid var(--border2);border-radius:6px;min-height:38px;cursor:text;align-items:center}
+.tag-input-wrap:focus-within{border-color:var(--accent)}
+.tag-chip{display:flex;align-items:center;gap:.3rem;padding:.15rem .55rem;border-radius:20px;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);font-size:.7rem;color:var(--purple)}
+.tag-chip button{background:none;border:none;color:var(--purple);cursor:pointer;font-size:.7rem;padding:0;line-height:1}
+.tag-input{background:transparent;border:none;outline:none;font-size:.78rem;color:var(--text);font-family:'Noto Sans TC',sans-serif;min-width:80px;flex:1}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav>
+  <div class="nav-brand">✈ <span>旅遊助理</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="goPage('plan')"><span class="tab-icon">🗺</span> 路線規劃</button>
+    <button class="nav-tab" onclick="goPage('fx')"><span class="tab-icon">💱</span> 匯率換算</button>
+    <button class="nav-tab" onclick="goPage('exp')"><span class="tab-icon">🧾</span> 旅遊記帳</button>
+  </div>
+</nav>
+
+<!-- ══════════════ PAGE: ROUTE PLANNER ══════════════ -->
+<div class="page active" id="page-plan">
+  <div class="planner-body">
+    <div class="planner-left">
+      <div class="inner-tabs">
+        <button class="inner-tab active" onclick="switchInner(0)">① 輸入地點</button>
+        <button class="inner-tab" onclick="switchInner(1)">② 調整清單</button>
+      </div>
+      <!-- tab 0 -->
+      <div class="inner-content active" id="itab0">
+        <div>
+          <label class="field-label">貼上地點（一行一個）</label>
+          <textarea id="placesInput" style="min-height:130px" placeholder="九份老街&#10;十份瀑布，新北市&#10;基隆廟口夜市&#10;平溪天燈老街&#10;金瓜石黃金博物館&#10;正濱漁港"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.7rem">
+          <div><label class="field-label">旅遊天數</label><input type="number" id="daysInput" value="2" min="1" max="10"></div>
+          <div><label class="field-label">出發時間</label><input type="text" id="startTime" value="09:00"></div>
+          <div><label class="field-label">交通方式</label><select id="transport"><option value="開車">🚗 開車</option><option value="大眾運輸">🚌 大眾運輸</option><option value="騎車">🛵 騎車</option><option value="混合">🔀 混合</option></select></div>
+          <div><label class="field-label">旅遊風格</label><select id="styleSelect"><option value="悠閒">😌 悠閒</option><option value="高效">⚡ 高效</option><option value="美食">🍜 美食</option><option value="拍照">📸 拍照</option></select></div>
+        </div>
+        <div><label class="field-label">出發地（選填）</label><input type="text" id="startCity" placeholder="例如：台北車站"></div>
+        <div id="planErr" class="err-box"></div>
+        <button class="btn btn-primary" id="genBtn" onclick="generatePlan()" style="width:100%;padding:.8rem;font-size:.88rem">
+          <span id="genText">✨ AI 規劃最佳路線</span>
+        </button>
+      </div>
+      <!-- tab 1 -->
+      <div class="inner-content" id="itab1">
+        <div id="placeListWrap"><div class="empty-exp" style="padding:2rem 1rem"><div class="ei">📍</div><p>先規劃行程，再來這裡<br>拖曳調整順序</p></div></div>
+      </div>
+    </div>
+
+    <div class="planner-right">
+      <div class="map-area" id="mapArea">
+        <div class="map-ph"><div class="mi">🗺️</div><p>規劃後路線地圖<br>將顯示在這裡</p></div>
+      </div>
+      <div class="itin-bar" id="itinBar">
+        <div class="itin-hdr"><span class="itin-hdr-title">📋 行程詳情</span></div>
+        <div class="sum-chips" id="sumChips"></div>
+        <div class="day-tabs-row" id="dayTabsRow"></div>
+        <div class="stops-list" id="stopsList"></div>
+        <div class="tips-bar" id="tipsBar" style="display:none"><strong>✦ 旅遊提醒</strong><span id="tipsText"></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PAGE: CURRENCY ══════════════ -->
+<div class="page" id="page-fx">
+  <div class="page-header">
+    <h2>💱 匯率換算</h2>
+    <p>即時匯率 · 多幣別對照 · 快速換算旅遊花費</p>
+  </div>
+  <div class="currency-grid">
+    <!-- Converter -->
+    <div class="fx-card">
+      <div style="font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem">即時換算</div>
+      <div class="fx-row">
+        <div class="fx-amount-wrap">
+          <label class="field-label">金額</label>
+          <input type="number" id="fxAmount" value="1000" min="0" step="any" oninput="calcFx()" style="font-family:'DM Mono',monospace;font-size:1.4rem">
+        </div>
+        <div class="fx-currency-sel">
+          <label class="field-label">幣別</label>
+          <select id="fxFrom" onchange="calcFx()"></select>
+        </div>
+        <button class="swap-btn" onclick="swapFx()" title="互換">⇄</button>
+        <div class="fx-currency-sel">
+          <label class="field-label">換成</label>
+          <select id="fxTo" onchange="calcFx()"></select>
+        </div>
+      </div>
+      <div class="fx-result">
+        <div class="fx-result-num mono" id="fxResult">—</div>
+        <div class="fx-result-label" id="fxResultLabel">輸入金額後自動計算</div>
+      </div>
+      <div class="fx-quick-btns" id="fxQuickBtns"></div>
+      <div class="fx-rate-info" id="fxRateInfo"></div>
+      <div class="fx-err" id="fxErr" style="display:none"></div>
+    </div>
+
+    <!-- Rate table -->
+    <div class="fx-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+        <span style="font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">各幣別對 TWD</span>
+        <span id="fxUpdateTime" style="font-size:.67rem;color:var(--muted2)"></span>
+      </div>
+      <div id="fxTableWrap"><div class="fx-loading"><span class="loader-ring"></span><p style="margin-top:.6rem">載入匯率中…</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PAGE: EXPENSE ══════════════ -->
+<div class="page" id="page-exp">
+  <div class="expense-layout">
+
+    <!-- Form -->
+    <div class="expense-form-panel">
+      <div class="form-hdr">
+        <span class="form-hdr-title" id="formTitle">➕ 新增消費</span>
+        <div style="display:flex;gap:.4rem">
+          <button class="btn btn-ghost btn-sm" id="cancelEditBtn" onclick="cancelEdit()" style="display:none">取消</button>
+          <button class="btn btn-primary btn-sm" onclick="submitExpense()">儲存</button>
+        </div>
+      </div>
+      <div class="form-body">
+
+        <!-- Amount + currency -->
+        <div>
+          <label class="field-label">消費金額</label>
+          <div class="cur-tag-row">
+            <div class="fx-currency-sel" style="width:100px">
+              <select id="expCurrency"></select>
+            </div>
+            <div class="amount-input-wrap" style="flex:1">
+              <input type="number" id="expAmount" placeholder="0" min="0" step="any">
+            </div>
+          </div>
+        </div>
+
+        <!-- Date + Time -->
+        <div class="form-row">
+          <div><label class="field-label">消費日期</label><input type="date" id="expDate"></div>
+          <div><label class="field-label">時間（選填）</label><input type="text" id="expTime" placeholder="14:30"></div>
+        </div>
+
+        <!-- Description -->
+        <div><label class="field-label">消費內容</label><input type="text" id="expDesc" placeholder="例如：珍珠奶茶、門票…"></div>
+
+        <!-- Category -->
+        <div>
+          <label class="field-label">消費類別</label>
+          <div class="cat-grid" id="catGrid"></div>
+        </div>
+
+        <!-- Payment -->
+        <div>
+          <label class="field-label">付款方式</label>
+          <div class="payment-btns" id="paymentBtns">
+            <button class="pay-btn" onclick="selectPay(this,'現金')">💵 現金</button>
+            <button class="pay-btn" onclick="selectPay(this,'刷卡')">💳 刷卡</button>
+            <button class="pay-btn" onclick="selectPay(this,'行動支付')">📱 行動支付</button>
+            <button class="pay-btn" onclick="selectPay(this,'轉帳')">🏦 轉帳</button>
+            <button class="pay-add" onclick="addCustomPay()">＋ 自訂</button>
+          </div>
+        </div>
+
+        <!-- Location -->
+        <div><label class="field-label">地點（選填）</label><input type="text" id="expLocation" placeholder="例如：九份老街 N°3 茶樓"></div>
+
+        <!-- Notes -->
+        <div><label class="field-label">備註（選填）</label><textarea id="expNote" placeholder="任何補充說明…" style="min-height:60px"></textarea></div>
+
+        <!-- Tags -->
+        <div>
+          <label class="field-label">標籤（選填）</label>
+          <div class="tag-input-wrap" id="tagInputWrap" onclick="document.getElementById('tagRealInput').focus()">
+            <input class="tag-input" id="tagRealInput" placeholder="輸入後按 Enter" onkeydown="handleTagInput(event)">
+          </div>
+        </div>
+
+        <!-- Rating -->
+        <div>
+          <label class="field-label">體驗評分（選填）</label>
+          <div class="star-row" id="starRow">
+            <span class="star" onclick="setRating(1)">★</span>
+            <span class="star" onclick="setRating(2)">★</span>
+            <span class="star" onclick="setRating(3)">★</span>
+            <span class="star" onclick="setRating(4)">★</span>
+            <span class="star" onclick="setRating(5)">★</span>
+          </div>
+        </div>
+
+        <!-- Receipt -->
+        <div>
+          <label class="field-label">收據上傳（選填）</label>
+          <div class="receipt-zone" id="receiptZone">
+            <input type="file" id="receiptFile" accept="image/*,.pdf" onchange="handleReceipt(event)">
+            <div class="receipt-icon">🧾</div>
+            <div class="receipt-label">點擊或拖曳上傳收據<br><span style="font-size:.67rem;color:var(--muted2)">支援 JPG / PNG / PDF</span></div>
+            <div class="receipt-name" id="receiptName"></div>
+            <img class="receipt-preview" id="receiptPreview" alt="收據預覽">
+          </div>
+        </div>
+
+        <!-- Split -->
+        <div>
+          <label class="field-label">分帳人數（選填）</label>
+          <div style="display:flex;align-items:center;gap:.7rem">
+            <input type="number" id="expSplit" placeholder="1" min="1" max="20" style="width:80px;text-align:center;font-family:'DM Mono',monospace">
+            <span style="font-size:.78rem;color:var(--muted)">人均：<span class="mono" id="perPersonAmt" style="color:var(--accent2)">—</span></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- List -->
+    <div class="expense-list-panel">
+      <div class="list-hdr">
+        <div class="list-hdr-left">
+          <div class="search-wrap"><input class="search-bar" id="expSearch" placeholder="搜尋…" oninput="renderExpList()"></div>
+          <select class="filter-sel" id="catFilter" onchange="renderExpList()"><option value="">全部類別</option></select>
+          <select class="filter-sel" id="payFilter" onchange="renderExpList()"><option value="">全部付款</option></select>
+        </div>
+        <div style="display:flex;gap:.5rem">
+          <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇ 匯出 CSV</button>
+          <button class="btn btn-danger btn-sm" onclick="clearAllExp()">清除全部</button>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="exp-summary" id="expSummary">
+        <div class="sum-cell"><div class="sum-val mono" id="sumTotal">0</div><div class="sum-lbl">總消費 (TWD)</div></div>
+        <div class="sum-cell"><div class="sum-val mono" id="sumCount">0</div><div class="sum-lbl">筆數</div></div>
+        <div class="sum-cell"><div class="sum-val mono" id="sumAvg">0</div><div class="sum-lbl">平均每筆</div></div>
+        <div class="sum-cell"><div class="sum-val mono" id="sumTop">—</div><div class="sum-lbl">最高類別</div></div>
+      </div>
+
+      <div class="exp-list" id="expList">
+        <div class="empty-exp"><div class="ei">🧾</div><p>還沒有記帳紀錄<br>在左邊填入消費後儲存</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Receipt modal -->
+<div class="modal-overlay" id="receiptModal" onclick="closeReceiptModal(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="document.getElementById('receiptModal').classList.remove('show')">✕</button>
+    <img id="modalImg" src="" alt="收據">
+    <div id="modalPdfNote" style="display:none;text-align:center;padding:1rem;color:var(--muted);font-size:.82rem">📄 PDF 收據已上傳</div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════
+// NAV
+// ══════════════════════════════
+function goPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const map={plan:0,fx:1,exp:2};
+  document.querySelectorAll('.nav-tab')[map[id]].classList.add('active');
+  if(id==='fx')initFx();
+}
+
+// ══════════════════════════════
+// PLANNER
+// ══════════════════════════════
+let planData=null,activeDayIdx=0,placeItems=[],dragSrc=null;
+const DAY_COLS=['#4da8f0','#e8963a','#45c97a','#a78bfa','#f07070','#60d0d0'];
+
+function switchInner(i){
+  document.querySelectorAll('.inner-tab').forEach((t,j)=>t.classList.toggle('active',i===j));
+  document.querySelectorAll('.inner-content').forEach((c,j)=>c.classList.toggle('active',i===j));
+}
+
+async function generatePlan(){
+  const raw=document.getElementById('placesInput').value.trim();
+  const days=parseInt(document.getElementById('daysInput').value)||2;
+  const transport=document.getElementById('transport').value;
+  const style=document.getElementById('styleSelect').value;
+  const startCity=document.getElementById('startCity').value.trim();
+  const startTime=document.getElementById('startTime').value||'09:00';
+  const errEl=document.getElementById('planErr');
+  errEl.classList.remove('show');
+  if(!raw){errEl.textContent='請先貼上地點清單！';errEl.classList.add('show');return}
+  const places=raw.split('\n').map(s=>s.trim()).filter(Boolean);
+  if(places.length<2){errEl.textContent='至少需要 2 個地點。';errEl.classList.add('show');return}
+  const btn=document.getElementById('genBtn'),txt=document.getElementById('genText');
+  btn.disabled=true;txt.innerHTML='<span class="loader-ring"></span> 規劃中…';
+
+  const sys=`你是台灣旅遊專家。回覆純 JSON，無 markdown。格式：{"summary":{"total_places":數字,"total_days":數字,"theme":"一句主題"},"days":[{"day":1,"title":"標題","stops":[{"order":1,"name":"地點","arrive_at":"HH:MM","stay_min":90,"transit_min_from_prev":20,"tip":"一句建議20字","lat":緯度,"lng":經度}]}],"overall_tips":"100字"}lat/lng為真實台灣座標，不確定填null。依地理鄰近分組。`;
+  const user=`地點：\n${places.map((p,i)=>`${i+1}. ${p}`).join('\n')}\n設定：${days}天、${transport}、${style}、${startTime}出發${startCity?'、從'+startCity:''}`;
+
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:sys,messages:[{role:"user",content:user}]})});
+    const data=await res.json();
+    const txt2=data.content.map(b=>b.text||'').join('');
+    planData=JSON.parse(txt2.replace(/```json|```/g,'').trim());
+    buildPlanUI(planData);switchInner(1);
+  }catch(e){errEl.textContent='規劃失敗：'+e.message;errEl.classList.add('show')}
+  finally{btn.disabled=false;document.getElementById('genText').textContent='✨ AI 規劃最佳路線'}
+}
+
+function buildPlanUI(plan){
+  placeItems=[];
+  plan.days.forEach((day,di)=>day.stops.forEach((stop,si)=>placeItems.push({name:stop.name,enabled:true,dayIdx:di,order:si,arrive_at:stop.arrive_at,stay_min:stop.stay_min,transit_min:stop.transit_min_from_prev,tip:stop.tip,lat:stop.lat,lng:stop.lng})));
+  renderPlaceList();renderItinerary(0);renderPlanMap(plan);renderDayTabs(plan);renderSumChips(plan);
+  document.getElementById('itinBar').style.display='block';
+  if(plan.overall_tips){document.getElementById('tipsBar').style.display='block';document.getElementById('tipsText').textContent=plan.overall_tips}
+}
+
+function renderPlaceList(){
+  const c=document.getElementById('placeListWrap');c.innerHTML='';
+  if(!placeItems.length){c.innerHTML='<div style="color:var(--muted);font-size:.8rem;padding:1rem">尚無地點</div>';return}
+  placeItems.forEach((item,idx)=>{
+    const el=document.createElement('div');
+    el.className='place-item'+(item.enabled?'':' disabled');
+    el.draggable=true;el.dataset.idx=idx;
+    const color=DAY_COLS[item.dayIdx%DAY_COLS.length];
+    el.innerHTML=`<span class="drag-handle">⠿</span><input type="checkbox" class="place-chk" ${item.enabled?'checked':''} onchange="togglePI(${idx},this.checked)"><span class="place-nm">${item.name}</span><span class="chip" style="font-size:.62rem;background:${color}22;border-color:${color}55;color:${color}">Day${item.dayIdx+1}</span><button class="place-del" onclick="removePI(${idx})">✕</button>`;
+    el.addEventListener('dragstart',e=>{dragSrc=idx;el.classList.add('dragging')});
+    el.addEventListener('dragend',()=>document.querySelectorAll('.place-item').forEach(x=>x.classList.remove('dragging','drag-over')));
+    el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('drag-over')});
+    el.addEventListener('dragleave',()=>el.classList.remove('drag-over'));
+    el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('drag-over');if(dragSrc!=null&&dragSrc!==idx){[placeItems[dragSrc],placeItems[idx]]=[placeItems[idx],placeItems[dragSrc]];renderPlaceList();if(planData)refreshPlan()}});
+    c.appendChild(el);
+  });
+}
+function togglePI(idx,v){placeItems[idx].enabled=v;renderPlaceList();if(planData)refreshPlan()}
+function removePI(idx){placeItems.splice(idx,1);renderPlaceList();if(planData)refreshPlan()}
+function refreshPlan(){renderItinerary(activeDayIdx);if(planData)renderPlanMap(planData)}
+
+function renderDayTabs(plan){
+  const c=document.getElementById('dayTabsRow');c.innerHTML='';
+  plan.days.forEach((day,i)=>{
+    const b=document.createElement('button');b.className='day-tab-btn'+(i===activeDayIdx?' active':'');
+    const col=DAY_COLS[i%DAY_COLS.length];
+    if(i===activeDayIdx)b.style.cssText=`background:${col};border-color:${col};color:white`;
+    b.textContent=`Day${day.day} · ${day.title}`;
+    b.onclick=()=>{activeDayIdx=i;renderItinerary(i);renderDayTabs(plan)};
+    c.appendChild(b);
+  });
+}
+
+function renderItinerary(dayIdx){
+  const c=document.getElementById('stopsList');
+  const items=placeItems.filter(p=>p.dayIdx===dayIdx&&p.enabled);
+  if(!items.length){c.innerHTML='<div style="color:var(--muted);font-size:.8rem;padding:.5rem 0">這天沒有啟用景點</div>';return}
+  const col=DAY_COLS[dayIdx%DAY_COLS.length];c.innerHTML='';
+  items.forEach((item,si)=>{
+    const url=`https://www.google.com/maps/search/${encodeURIComponent(item.name)}`;
+    const row=document.createElement('div');row.className='stop-row';
+    row.innerHTML=`<div class="stop-badge" style="background:${col}">${si+1}</div><div class="stop-detail"><div class="stop-nm">${item.name}</div><div class="stop-meta">${item.arrive_at?`<span class="meta-c">🕐 ${item.arrive_at}</span>`:''} ${item.transit_min&&si>0?`<span class="meta-c">🚗 ${item.transit_min}分</span>`:''} ${item.stay_min?`<span class="meta-c">⏱ ${item.stay_min}分</span>`:''}</div>${item.tip?`<div class="stop-tip">💬 ${item.tip}</div>`:''}</div><a href="${url}" target="_blank" class="maps-lnk">地圖↗</a>`;
+    c.appendChild(row);
+  });
+}
+
+function renderSumChips(plan){
+  const c=document.getElementById('sumChips');
+  const total=placeItems.filter(p=>p.enabled).length;
+  c.innerHTML=`<span class="chip">📍 ${total} 景點</span><span class="chip">📅 ${plan.summary.total_days} 天</span><span class="chip">✨ ${plan.summary.theme}</span>`;
+}
+
+function renderPlanMap(plan){
+  const area=document.getElementById('mapArea');
+  const all=[];
+  plan.days.forEach((day,di)=>day.stops.forEach((stop,si)=>{
+    const item=placeItems.find(p=>p.name===stop.name&&p.dayIdx===di);
+    if(!item||!item.enabled)return;
+    if(stop.lat&&stop.lng)all.push({...stop,dayIdx:di,stopIdx:si,color:DAY_COLS[di%DAY_COLS.length]});
+  }));
+  if(!all.length){area.innerHTML='<div class="map-ph"><div class="mi">📍</div><p>地點缺少座標資料</p></div>';return}
+  const lats=all.map(s=>s.lat),lngs=all.map(s=>s.lng);
+  const minLat=Math.min(...lats),maxLat=Math.max(...lats),minLng=Math.min(...lngs),maxLng=Math.max(...lngs);
+  const pLat=(maxLat-minLat)*.18||.01,pLng=(maxLng-minLng)*.18||.01;
+  const W=area.clientWidth||600,H=area.clientHeight||300;
+  const toXY=(lat,lng)=>[((lng-minLng+pLng)/((maxLng+pLng)-(minLng-pLng)))*W,(1-(lat-minLat+pLat)/((maxLat+pLat)-(minLat-pLat)))*H];
+  let svg=`<svg id="mapSvg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><rect width="${W}" height="${H}" fill="#161d28"/>`;
+  for(let i=0;i<=4;i++){svg+=`<line x1="0" y1="${H/4*i}" x2="${W}" y2="${H/4*i}" stroke="#252f3e" stroke-width="0.5"/><line x1="${W/4*i}" y1="0" x2="${W/4*i}" y2="${H}" stroke="#252f3e" stroke-width="0.5"/>`}
+  plan.days.forEach((day,di)=>{
+    const ds=all.filter(s=>s.dayIdx===di);if(ds.length<2)return;
+    const col=DAY_COLS[di%DAY_COLS.length];
+    let d='M';ds.forEach((s,i)=>{const[x,y]=toXY(s.lat,s.lng);d+=`${i===0?'',' L'}${x.toFixed(1)} ${y.toFixed(1)}`});
+    svg+=`<path d="${d}" class="map-path" stroke="${col}"/>`;
+  });
+  all.forEach(s=>{
+    const[x,y]=toXY(s.lat,s.lng);
+    const url=`https://www.google.com/maps/search/${encodeURIComponent(s.name)}`;
+    const nm=s.name.length>7?s.name.slice(0,6)+'…':s.name;
+    svg+=`<g style="cursor:pointer" onclick="window.open('${url}','_blank')"><circle cx="${x}" cy="${y}" r="16" fill="${s.color}" opacity="0.12"/><circle cx="${x}" cy="${y}" r="7" fill="${s.color}" stroke="#0b0f14" stroke-width="1.5"/><text x="${x}" y="${y+3.5}" text-anchor="middle" font-size="8" font-weight="700" fill="white" font-family="sans-serif">${s.stopIdx+1}</text><text x="${x+12}" y="${y+4}" text-anchor="start" font-size="10" fill="#dde6f0" font-family="sans-serif">${nm}</text></g>`;
+  });
+  svg+='</svg>';area.innerHTML=svg;
+}
+
+// ══════════════════════════════
+// CURRENCY
+// ══════════════════════════════
+const CURRENCIES=[
+  {code:'TWD',name:'新台幣',flag:'🇹🇼'},{code:'USD',name:'美元',flag:'🇺🇸'},
+  {code:'JPY',name:'日圓',flag:'🇯🇵'},{code:'KRW',name:'韓圓',flag:'🇰🇷'},
+  {code:'EUR',name:'歐元',flag:'🇪🇺'},{code:'GBP',name:'英鎊',flag:'🇬🇧'},
+  {code:'HKD',name:'港幣',flag:'🇭🇰'},{code:'CNY',name:'人民幣',flag:'🇨🇳'},
+  {code:'THB',name:'泰銖',flag:'🇹🇭'},{code:'SGD',name:'新加坡幣',flag:'🇸🇬'},
+  {code:'AUD',name:'澳幣',flag:'🇦🇺'},{code:'MYR',name:'馬來西亞令吉',flag:'🇲🇾'},
+  {code:'VND',name:'越南盾',flag:'🇻🇳'},{code:'IDR',name:'印尼盾',flag:'🇮🇩'},
+  {code:'PHP',name:'菲律賓比索',flag:'🇵🇭'},
+];
+// Approximate rates vs TWD (fallback)
+const FALLBACK_RATES={TWD:1,USD:32.5,JPY:0.217,KRW:0.0239,EUR:35.2,GBP:41.1,HKD:4.17,CNY:4.47,THB:0.89,SGD:24.1,AUD:20.8,MYR:7.22,VND:0.00132,IDR:0.00208,PHP:0.569};
+let fxRates={},fxLoaded=false,fxInitDone=false;
+
+function initFx(){
+  if(fxInitDone)return;fxInitDone=true;
+  populateFxSelects();buildFxQuick();loadFxRates();
+}
+
+function populateFxSelects(){
+  ['fxFrom','fxTo','expCurrency'].forEach(id=>{
+    const sel=document.getElementById(id);if(!sel)return;
+    sel.innerHTML='';
+    CURRENCIES.forEach(c=>{
+      const o=document.createElement('option');
+      o.value=c.code;o.textContent=`${c.flag} ${c.code}`;
+      sel.appendChild(o);
+    });
+  });
+  document.getElementById('fxFrom').value='TWD';
+  document.getElementById('fxTo').value='JPY';
+  document.getElementById('expCurrency').value='TWD';
+}
+
+async function loadFxRates(){
+  try{
+    const res=await fetch('https://api.exchangerate-api.com/v4/latest/TWD');
+    if(res.ok){const d=await res.json();fxRates=d.rates;fxRates.TWD=1;}
+    else throw new Error('API error');
+  }catch{
+    fxRates={...FALLBACK_RATES};
+    document.getElementById('fxErr').style.display='block';
+    document.getElementById('fxErr').textContent='⚠ 無法取得即時匯率，使用近似參考值';
+  }
+  fxLoaded=true;
+  document.getElementById('fxUpdateTime').textContent='更新：'+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+  buildFxTable();calcFx();
+}
+
+function calcFx(){
+  if(!fxLoaded)return;
+  const amt=parseFloat(document.getElementById('fxAmount').value)||0;
+  const from=document.getElementById('fxFrom').value;
+  const to=document.getElementById('fxTo').value;
+  const rateFrom=fxRates[from]||1,rateTo=fxRates[to]||1;
+  const result=amt*(rateTo/rateFrom);
+  const resultEl=document.getElementById('fxResult');
+  resultEl.textContent=formatFxNum(result,to);
+  document.getElementById('fxResultLabel').textContent=`${amt.toLocaleString()} ${from} ≈ ${formatFxNum(result,to)} ${to}`;
+  document.getElementById('fxRateInfo').innerHTML=`1 ${from} = <span>${formatFxNum(rateTo/rateFrom,to)}</span> ${to}`;
+  updatePerPerson();
+}
+
+function formatFxNum(n,cur){
+  if(['JPY','KRW','VND','IDR'].includes(cur))return Math.round(n).toLocaleString();
+  return n.toLocaleString('zh-TW',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+
+function swapFx(){
+  const f=document.getElementById('fxFrom').value,t=document.getElementById('fxTo').value;
+  document.getElementById('fxFrom').value=t;document.getElementById('fxTo').value=f;calcFx();
+}
+
+function buildFxQuick(){
+  const wrap=document.getElementById('fxQuickBtns');
+  [100,500,1000,5000,10000].forEach(v=>{
+    const b=document.createElement('button');b.className='fx-quick';b.textContent=v.toLocaleString();
+    b.onclick=()=>{document.querySelectorAll('.fx-quick').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById('fxAmount').value=v;calcFx()};
+    wrap.appendChild(b);
+  });
+}
+
+function buildFxTable(){
+  const wrap=document.getElementById('fxTableWrap');
+  const baseAmt=parseFloat(document.getElementById('fxAmount').value)||1000;
+  let html=`<table class="fx-table"><thead><tr><th>幣別</th><th>匯率 (vs TWD)</th><th>${baseAmt.toLocaleString()} TWD</th></tr></thead><tbody>`;
+  CURRENCIES.filter(c=>c.code!=='TWD').forEach(c=>{
+    const rate=fxRates[c.code]||FALLBACK_RATES[c.code]||'—';
+    const converted=typeof rate==='number'?formatFxNum(baseAmt*rate,c.code):'—';
+    html+=`<tr><td><span class="fx-flag">${c.flag}</span>${c.code} <span style="color:var(--muted);font-size:.7rem">${c.name}</span></td><td class="fx-val">${typeof rate==='number'?rate.toFixed(4):rate}</td><td class="fx-val">${converted}</td></tr>`;
+  });
+  html+='</tbody></table>';wrap.innerHTML=html;
+}
+
+// ══════════════════════════════
+// EXPENSE TRACKER
+// ══════════════════════════════
+const CATEGORIES=[
+  {id:'food',label:'餐飲',icon:'🍜'},{id:'transport',label:'交通',icon:'🚌'},
+  {id:'stay',label:'住宿',icon:'🏨'},{id:'ticket',label:'門票',icon:'🎟'},
+  {id:'shop',label:'購物',icon:'🛍'},{id:'cafe',label:'咖啡',icon:'☕'},
+  {id:'souvenir',label:'紀念品',icon:'🎁'},{id:'activity',label:'活動',icon:'🎡'},
+  {id:'health',label:'醫藥',icon:'💊'},{id:'beauty',label:'美容',icon:'💆'},
+  {id:'other',label:'其他',icon:'📦'},
+];
+let expenses=JSON.parse(localStorage.getItem('travel_expenses')||'[]');
+let editId=null,selectedPay='',selectedCat='',rating=0,expTags=[],receiptDataUrl=null,receiptFileName=null;
+
+function initExpense(){
+  buildCatGrid();populateFxSelects();
+  document.getElementById('expDate').value=new Date().toISOString().slice(0,10);
+  renderExpList();buildFilterOptions();
+  document.getElementById('expAmount').addEventListener('input',updatePerPerson);
+  document.getElementById('expSplit').addEventListener('input',updatePerPerson);
+}
+
+function buildCatGrid(){
+  const grid=document.getElementById('catGrid');grid.innerHTML='';
+  CATEGORIES.forEach(cat=>{
+    const b=document.createElement('button');b.className='cat-btn';b.dataset.cat=cat.id;
+    b.innerHTML=`<span class="cat-icon">${cat.icon}</span>${cat.label}`;
+    b.onclick=()=>selectCat(cat.id);grid.appendChild(b);
+  });
+}
+
+function selectCat(id){
+  selectedCat=selectedCat===id?'':id;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.toggle('active',b.dataset.cat===selectedCat));
+}
+
+function selectPay(btn,val){
+  selectedPay=selectedPay===val?'':val;
+  document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('active'));
+  if(selectedPay)btn.classList.add('active');
+}
+
+function addCustomPay(){
+  const name=prompt('輸入自訂付款方式：');if(!name||!name.trim())return;
+  const btns=document.getElementById('paymentBtns');
+  const addBtn=btns.querySelector('.pay-add');
+  const b=document.createElement('button');b.className='pay-btn';b.textContent='💼 '+name.trim();
+  b.onclick=()=>selectPay(b,name.trim());
+  btns.insertBefore(b,addBtn);selectPay(b,name.trim());
+}
+
+function setRating(n){
+  rating=rating===n?0:n;
+  document.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('lit',i<rating));
+}
+
+function handleTagInput(e){
+  if(e.key!=='Enter'&&e.key!==',')return;
+  e.preventDefault();
+  const val=e.target.value.trim();
+  if(!val||expTags.includes(val))return;
+  expTags.push(val);e.target.value='';renderTags();
+}
+function renderTags(){
+  const wrap=document.getElementById('tagInputWrap');
+  wrap.querySelectorAll('.tag-chip').forEach(t=>t.remove());
+  const input=document.getElementById('tagRealInput');
+  expTags.forEach((tag,i)=>{
+    const chip=document.createElement('span');chip.className='tag-chip';
+    chip.innerHTML=`${tag}<button onclick="removeTag(${i})">✕</button>`;
+    wrap.insertBefore(chip,input);
+  });
+}
+function removeTag(i){expTags.splice(i,1);renderTags()}
+
+function handleReceipt(e){
+  const file=e.target.files[0];if(!file)return;
+  receiptFileName=file.name;
+  document.getElementById('receiptName').textContent='📎 '+file.name;
+  document.getElementById('receiptZone').classList.add('has-file');
+  if(file.type.startsWith('image/')){
+    const reader=new FileReader();
+    reader.onload=ev=>{receiptDataUrl=ev.target.result;const img=document.getElementById('receiptPreview');img.src=ev.target.result;img.style.display='block'};
+    reader.readAsDataURL(file);
+  }else{receiptDataUrl='pdf';document.getElementById('receiptPreview').style.display='none'}
+}
+
+function updatePerPerson(){
+  const amt=parseFloat(document.getElementById('expAmount').value)||0;
+  const split=parseInt(document.getElementById('expSplit').value)||1;
+  const cur=document.getElementById('expCurrency').value||'TWD';
+  document.getElementById('perPersonAmt').textContent=split>1?(amt/split).toFixed(2)+' '+cur:'—';
+}
+
+function submitExpense(){
+  const exp={
+    id:editId||Date.now().toString(),
+    amount:parseFloat(document.getElementById('expAmount').value)||null,
+    currency:document.getElementById('expCurrency').value||'TWD',
+    amountTWD:null,
+    date:document.getElementById('expDate').value||null,
+    time:document.getElementById('expTime').value||null,
+    desc:document.getElementById('expDesc').value.trim()||null,
+    cat:selectedCat||null,
+    payment:selectedPay||null,
+    location:document.getElementById('expLocation').value.trim()||null,
+    note:document.getElementById('expNote').value.trim()||null,
+    tags:[...expTags],
+    rating:rating||null,
+    receipt:receiptDataUrl||null,
+    receiptName:receiptFileName||null,
+    split:parseInt(document.getElementById('expSplit').value)||null,
+    createdAt:editId?expenses.find(e=>e.id===editId)?.createdAt:Date.now(),
+    updatedAt:Date.now(),
+  };
+  // Convert to TWD for summary
+  if(exp.amount&&fxLoaded){
+    const rate=fxRates[exp.currency]||FALLBACK_RATES[exp.currency]||1;
+    exp.amountTWD=exp.amount/rate;
+  }else if(exp.amount){exp.amountTWD=exp.currency==='TWD'?exp.amount:exp.amount}
+
+  if(editId){const idx=expenses.findIndex(e=>e.id===editId);if(idx>-1)expenses[idx]=exp}
+  else expenses.unshift(exp);
+  saveExpenses();resetForm();renderExpList();buildFilterOptions();
+}
+
+function resetForm(){
+  editId=null;selectedPay='';selectedCat='';rating=0;expTags=[];receiptDataUrl=null;receiptFileName=null;
+  document.getElementById('expAmount').value='';
+  document.getElementById('expDate').value=new Date().toISOString().slice(0,10);
+  document.getElementById('expTime').value='';
+  document.getElementById('expDesc').value='';
+  document.getElementById('expLocation').value='';
+  document.getElementById('expNote').value='';
+  document.getElementById('expSplit').value='';
+  document.getElementById('perPersonAmt').textContent='—';
+  document.getElementById('receiptName').textContent='';
+  document.getElementById('receiptPreview').style.display='none';
+  document.getElementById('receiptZone').classList.remove('has-file');
+  document.getElementById('receiptFile').value='';
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.pay-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.star').forEach(s=>s.classList.remove('lit'));
+  renderTags();
+  document.getElementById('formTitle').textContent='➕ 新增消費';
+  document.getElementById('cancelEditBtn').style.display='none';
+  document.getElementById('expCurrency').value='TWD';
+}
+
+function editExpense(id){
+  const exp=expenses.find(e=>e.id===id);if(!exp)return;
+  editId=id;
+  document.getElementById('expAmount').value=exp.amount||'';
+  document.getElementById('expCurrency').value=exp.currency||'TWD';
+  document.getElementById('expDate').value=exp.date||'';
+  document.getElementById('expTime').value=exp.time||'';
+  document.getElementById('expDesc').value=exp.desc||'';
+  document.getElementById('expLocation').value=exp.location||'';
+  document.getElementById('expNote').value=exp.note||'';
+  document.getElementById('expSplit').value=exp.split||'';
+  selectedCat=exp.cat||'';document.querySelectorAll('.cat-btn').forEach(b=>b.classList.toggle('active',b.dataset.cat===selectedCat));
+  selectedPay=exp.payment||'';document.querySelectorAll('.pay-btn').forEach(b=>b.classList.toggle('active',b.textContent.includes(selectedPay)&&!!selectedPay));
+  rating=exp.rating||0;document.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('lit',i<rating));
+  expTags=[...(exp.tags||[])];renderTags();
+  receiptDataUrl=exp.receipt||null;receiptFileName=exp.receiptName||null;
+  if(exp.receipt&&exp.receipt!=='pdf'){document.getElementById('receiptPreview').src=exp.receipt;document.getElementById('receiptPreview').style.display='block';document.getElementById('receiptZone').classList.add('has-file')}
+  if(exp.receiptName)document.getElementById('receiptName').textContent='📎 '+exp.receiptName;
+  document.getElementById('formTitle').textContent='✏️ 編輯消費';
+  document.getElementById('cancelEditBtn').style.display='';
+  updatePerPerson();
+  document.querySelector('.expense-form-panel').scrollTop=0;
+}
+
+function cancelEdit(){resetForm()}
+
+function deleteExpense(id){
+  if(!confirm('確定要刪除這筆記錄嗎？'))return;
+  expenses=expenses.filter(e=>e.id!==id);
+  saveExpenses();renderExpList();buildFilterOptions();
+  if(editId===id)resetForm();
+}
+
+function clearAllExp(){if(!confirm('確定要清除所有記帳記錄？'))return;expenses=[];saveExpenses();renderExpList();buildFilterOptions()}
+
+function saveExpenses(){localStorage.setItem('travel_expenses',JSON.stringify(expenses))}
+
+function buildFilterOptions(){
+  const cats=new Set(expenses.map(e=>e.cat).filter(Boolean));
+  const pays=new Set(expenses.map(e=>e.payment).filter(Boolean));
+  const catSel=document.getElementById('catFilter');
+  const paySel=document.getElementById('payFilter');
+  const cv=catSel.value,pv=paySel.value;
+  catSel.innerHTML='<option value="">全部類別</option>';
+  cats.forEach(c=>{const cat=CATEGORIES.find(x=>x.id===c);catSel.innerHTML+=`<option value="${c}">${cat?cat.icon+' '+cat.label:c}</option>`});
+  paySel.innerHTML='<option value="">全部付款</option>';
+  pays.forEach(p=>paySel.innerHTML+=`<option value="${p}">${p}</option>`);
+  catSel.value=cv;paySel.value=pv;
+}
+
+function renderExpList(){
+  const search=document.getElementById('expSearch').value.toLowerCase();
+  const catF=document.getElementById('catFilter').value;
+  const payF=document.getElementById('payFilter').value;
+  let filtered=expenses.filter(e=>{
+    if(catF&&e.cat!==catF)return false;
+    if(payF&&e.payment!==payF)return false;
+    if(search){const hay=[e.desc,e.location,e.note,e.payment,...(e.tags||[])].filter(Boolean).join(' ').toLowerCase();if(!hay.includes(search))return false}
+    return true;
+  });
+
+  // Summary
+  const total=filtered.reduce((s,e)=>s+(e.amountTWD||0),0);
+  document.getElementById('sumTotal').textContent=Math.round(total).toLocaleString();
+  document.getElementById('sumCount').textContent=filtered.length;
+  document.getElementById('sumAvg').textContent=filtered.length?Math.round(total/filtered.length).toLocaleString():'0';
+  const catTotals={};filtered.forEach(e=>{if(e.cat)catTotals[e.cat]=(catTotals[e.cat]||0)+(e.amountTWD||0)});
+  const topCat=Object.entries(catTotals).sort((a,b)=>b[1]-a[1])[0];
+  const topCatObj=topCat?CATEGORIES.find(c=>c.id===topCat[0]):null;
+  document.getElementById('sumTop').textContent=topCatObj?topCatObj.icon+topCatObj.label:'—';
+
+  const list=document.getElementById('expList');
+  if(!filtered.length){list.innerHTML='<div class="empty-exp"><div class="ei">🧾</div><p>'+(expenses.length?'沒有符合篩選條件的記錄':'還沒有記帳紀錄<br>在左邊填入消費後儲存')+'</p></div>';return}
+  list.innerHTML='';
+  filtered.forEach(exp=>{
+    const cat=CATEGORIES.find(c=>c.id===exp.cat);
+    const catBg=exp.cat?getCatColor(exp.cat):'rgba(255,255,255,.08)';
+    const stars=exp.rating?'★'.repeat(exp.rating)+'☆'.repeat(5-exp.rating):'';
+    const card=document.createElement('div');card.className='exp-card'+(editId===exp.id?' editing':'');
+    card.innerHTML=`
+      <div class="exp-cat-icon" style="background:${catBg}">${cat?cat.icon:'📦'}</div>
+      <div class="exp-main">
+        <div class="exp-top">
+          ${exp.amount?`<span class="exp-amount">${exp.currency!=='TWD'?exp.currency+' ':''}${formatFxNum(exp.amount,exp.currency)}</span>`:'<span class="exp-amount" style="color:var(--muted)">未填金額</span>'}
+          ${exp.currency&&exp.currency!=='TWD'&&exp.amountTWD?`<span class="exp-cur">≈ TWD ${Math.round(exp.amountTWD).toLocaleString()}</span>`:''}
+          <span class="exp-desc">${exp.desc||'（未填消費內容）'}</span>
+        </div>
+        <div class="exp-meta">
+          ${exp.date?`<span class="exp-date">📅 ${exp.date}${exp.time?' '+exp.time:''}</span>`:''}
+          ${exp.payment?`<span class="exp-pay-badge">${exp.payment}</span>`:''}
+          ${exp.location?`<span class="exp-date">📍 ${exp.location}</span>`:''}
+          ${stars?`<span class="exp-stars">${stars}</span>`:''}
+          ${exp.receipt?`<span class="exp-receipt-icon" onclick="viewReceipt('${exp.id}')" style="cursor:pointer" title="查看收據">🧾</span>`:''}
+          ${(exp.tags||[]).map(t=>`<span class="chip" style="font-size:.62rem">#${t}</span>`).join('')}
+          ${exp.split&&exp.split>1&&exp.amount?`<span class="exp-date">÷${exp.split}人 = ${formatFxNum(exp.amount/exp.split,exp.currency)}</span>`:''}
+        </div>
+        ${exp.note?`<div class="exp-note">${exp.note}</div>`:''}
+      </div>
+      <div class="exp-actions">
+        <button class="exp-action-btn" onclick="editExpense('${exp.id}')" title="編輯">✏️</button>
+        <button class="exp-action-btn del" onclick="deleteExpense('${exp.id}')" title="刪除">🗑</button>
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+function getCatColor(id){
+  const m={food:'rgba(232,150,58,.18)',transport:'rgba(77,168,240,.18)',stay:'rgba(69,201,122,.18)',ticket:'rgba(240,192,64,.18)',shop:'rgba(167,139,250,.18)',cafe:'rgba(240,150,120,.18)',souvenir:'rgba(96,208,208,.18)',activity:'rgba(240,80,80,.18)',health:'rgba(240,92,92,.18)',beauty:'rgba(210,100,200,.18)',other:'rgba(255,255,255,.08)'};
+  return m[id]||'rgba(255,255,255,.08)';
+}
+
+function viewReceipt(id){
+  const exp=expenses.find(e=>e.id===id);if(!exp||!exp.receipt)return;
+  const modal=document.getElementById('receiptModal');
+  const img=document.getElementById('modalImg');
+  const pdf=document.getElementById('modalPdfNote');
+  if(exp.receipt==='pdf'){img.style.display='none';pdf.style.display='block'}
+  else{img.src=exp.receipt;img.style.display='block';pdf.style.display='none'}
+  modal.classList.add('show');
+}
+function closeReceiptModal(e){if(e.target===document.getElementById('receiptModal'))document.getElementById('receiptModal').classList.remove('show')}
+
+function exportCSV(){
+  if(!expenses.length)return alert('尚無記帳資料');
+  const headers=['日期','時間','消費內容','金額','幣別','TWD換算','類別','付款方式','地點','備註','評分','標籤','分帳人數','建立時間'];
+  const rows=expenses.map(e=>[
+    e.date||'',e.time||'',e.desc||'',e.amount||'',e.currency||'',
+    e.amountTWD?Math.round(e.amountTWD):'',
+    CATEGORIES.find(c=>c.id===e.cat)?.label||e.cat||'',
+    e.payment||'',e.location||'',e.note||'',e.rating||'',(e.tags||[]).join('|'),e.split||'',
+    e.createdAt?new Date(e.createdAt).toLocaleString('zh-TW'):''
+  ]);
+  const csv=[headers,...rows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download=`旅遊記帳_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+}
+
+// ══════════════════════════════
+// INIT
+// ══════════════════════════════
+initExpense();
+// Pre-populate fx selects for expense page
+document.getElementById('expCurrency').innerHTML='';
+CURRENCIES.forEach(c=>{const o=document.createElement('option');o.value=c.code;o.textContent=`${c.flag} ${c.code}`;document.getElementById('expCurrency').appendChild(o)});
+document.getElementById('expCurrency').value='TWD';
+</script>
+</body>
+</html>
